@@ -17,6 +17,17 @@ and RAG-based chat pipelines:
 * A new `ilab data` sub-command to generate and ingest embeddings from pre-processed documents into a configured vector store.
 * An option to enhance the chat pipeline by using the stored embeddings to augment the context of conversations, improving relevance and accuracy.
 
+### 1.1 User Experience Overview
+The commands are tailored to support diverse user experiences, all enabling the use of RAG functionality to enrich chat sessions.
+
+### 1.2 Model Training Path
+This flow is designed for users who aim to train their own models and leverage the source documents that support knowledge submissions to enhance the chat context:
+![model-training](../images/model-training.png)
+
+### 1.3 Plug-and-Play RAG Path
+This flow is designed for users who want to enhance their chat experience with pre-trained models by simply integrating the RAG functionality:
+![plug-and-play](../images/plug-and-play.png)
+
 ## 2. Proposed Pipelines
 ### 2.1 Working Assumption
 This proposal aims to serve as a reference design to develop a Proof of Concept for RAG workflows, while
