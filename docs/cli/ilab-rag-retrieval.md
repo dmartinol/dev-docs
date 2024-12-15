@@ -242,11 +242,21 @@ The following technologies form the foundation of the proposed solution:
 * [Docling](https://github.com/DS4SD/docling): Document processing tool. For more details, refer to William’s blog, [Docling: The missing document processing companion for generative AI](https://www.redhat.com/en/blog/docling-missing-document-processing-companion-generative-ai).
 
 ## 3. Design Considerations
-This solution must adopt a pluggable design to facilitate the easy integration of additional components:
-* Vector stores: Support all selected implementations.
-* Embedding models: Handle embedding models using the appropriate embedder implementation for the chosen framework.
-* Indexing services: Future extensions should allow retrieval of embeddings from configurable APIs, thereby extending the concept of a vector store
- to include these retrieval services.
+* As decided in [PR #165](https://github.com/instructlab/dev-docs/pull/165), functions related to RAG ingestion 
+  and retrieval are located in the dedicated folder `src/instructlab/rag`.
+* The solution must minimize changes to existing modules by importing the required functions from the 
+  `instructlab.rag` package.
+* The solution must adopt a pluggable design to facilitate seamless integration of additional components:
+  * **Vector stores**: Support all selected implementations (e.g., Milvus).
+  * **Embedding models**: Handle embedding models using the appropriate embedder implementation for the 
+    chosen framework (e.g., Haystack).
+  * Consider using factory functions to abstract implementations and enhance code flexibility.
+* Optional dependencies for 3rd party integrations should be defined in `pyproject.toml` and documented for 
+  clarity. Users can install optional components with commands like:
+
+  `pip install instructlab[milvus]`
+
+  3rd party dependencies may also be grouped in files such as `requirements/milvus.txt`.
 
 ## 4. Future Enhancements
 ### 4.1 Model Evaluation 
