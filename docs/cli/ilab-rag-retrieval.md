@@ -22,11 +22,21 @@ The commands are tailored to support diverse user experiences, all enabling the 
 
 ### 1.2 Model Training Path
 This flow is designed for users who aim to train their own models and leverage the source documents that support knowledge submissions to enhance the chat context:
-![model-training](../images/model-training.png)
+![model-training](../images/rag-model-training.png)
 
-### 1.3 Plug-and-Play RAG Path
+**Note**: documents are processed using `instructlab-sdg` package and are defined using the docling v1 schema.
+
+### 1.3 Tanomony Path (no Training)
+This flow is for users who have defined taxonomy knowledge but prefer not to train their own models. Instead, they aim to generate RAG artifacts from source documents to enhance the chat context:
+![tanomony-no-training](../images/rag-tanomony-no-training.png)
+
+**Note**: documents are processed using `docling.DocumentConverter` and are defined using the docling v2 schema.
+
+### 1.4 Plug-and-Play RAG Path
 This flow is designed for users who want to enhance their chat experience with pre-trained models by simply integrating the RAG functionality:
-![plug-and-play](../images/plug-and-play.png)
+![plug-and-play](../images/rag-plug-and-play.png)
+
+**Note**: documents are processed using `docling.DocumentConverter` and are defined using the docling v2 schema.
 
 ## 2. Proposed Pipelines
 ### 2.1 Working Assumption
