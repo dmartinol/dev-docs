@@ -14,6 +14,7 @@ This document proposes enhancements to the `ilab` CLI to support workflows utili
 (RAG) artifacts within `InstructLab`. The proposed changes introduce new commands and options for the embedding ingestion
 and RAG-based chat pipelines:
 * A new `ilab data` sub-command to process customer documentation.
+  * Either from knowledge taxonomy or from actual user documents.
 * A new `ilab data` sub-command to generate and ingest embeddings from pre-processed documents into a configured vector store.
 * An option to enhance the chat pipeline by using the stored embeddings to augment the context of conversations, improving relevance and accuracy.
 
@@ -48,15 +49,15 @@ cases.
 To maintain compatibility and simplicity, no new configurations will be introduced for new commands. Instead,
 the settings will be defined using the following hierarchy (options higher in the list overriding those below):
 * CLI flags (e.g., `--FLAG`).
-* Environment variables following a consistent naming convention, such as `ILAB_<UPPERCASE_ARGUMENT_NAME>`.
+* Environment variables following a consistent naming convention, such as `ILAB_<UPPERCASE_FLAG_NAME>`.
 * Default values, for all the applicable use cases.
 
 For example, the `vectordb-uri` argument can be implemented using the `click` module like this:
 ```py
 @click.option(
-    "--vectordb-uri",
+    "--document-store-uri",
     default='rag-output.db',
-    envvar="ILAB_VECTORDB_URI",
+    envvar="ILAB_DOCUMENT_STORE_URI",
 )
 ```
 
@@ -72,46 +73,67 @@ If the configured embedding model has not been cached, the command execution wil
 consistently to all new and updated commands.
 
 ### 2.2 Document Processing Pipeline
-The proposal is to add a `process`  sub-command to the `data` command group:
+The proposal is to add a `process`  sub-command to the `data` command group.
+
+For the Taxonomy path (no Model Training): 
 ```
-ilab data process --input /path/to/docs/folder --output /path/to/processed/folder
+ilab data process /path/to/processed/folder
 ```
 
+For the Plag-and-Play RAG path: 
+```
+ilab data process --input /path/to/docs/folder /path/to/processed/folder
+```
+ 
 #### Command Purpose
-Applies the transformation for the customer documents in `/path/to/docs/folder`. Processed artifacts are stored under `/path/to/processed/folder`.
+Applies the docling transformation to the customer documents. 
+* Original documents are located in the `/path/to/docs/folder` input folder or in the taxonomy knowledge branch.
+  * In the latter case, the input documents are the knowledge documents retrieved from the installed taxonomy repository
+    according to the [SDG diff strategy][sdg-diff-strategy], e.g. `the new or changed YAMLs using git diff, including untracked files`.
+* Processed artifacts are stored under `/path/to/processed/folder`.
 
 ***Notes**: 
-* In alignment with the current SDG implementation, the folder will not be navigated recursively. Only files located at the root level of the specified
-folder will be considered. The same principle applies to all other options outlined below.
-* To ensure consistency and avoid issues with document versioning or outdated artifacts, the destination folder will be cleared before execution. 
-  This ensures it contains only the artifacts generated from the most recent run.
+* In alignment with the current SDG implementation, the `--input` folder will not be navigated recursively. Only files located at the root 
+  level of the specified folder will be considered. The same principle applies to all other options outlined below.
+* To ensure consistency and avoid issues with document versioning or outdated artifacts, the destination folder will be cleared 
+  before execution. This ensures it contains only the artifacts generated from the most recent run.
 
-The trasformation is based on the `instructlab-sdg` modules (the initial step of the `ilab data generate` pipeline)
-
-### Why We Need It
-This command streamlines the `ilab data generate` pipeline and eliminates the requirement to define a `qna` document,
-which typically includes:
-* A minimum of 5×3 question-and-answer pairs.
-* Reference documents stored in Git.
-
-The goal is not to generate training data for InstructLab-trained models but to utilize the documents for RAG 
-workflows with pre-tuned models.
+The transformation is based on the latest version of the docling `DocumentConverter` (v2).
+The alternative to adopt the `instructlab-sdg` modules (e.g. the initial step of the `ilab data generate` pipeline) has been 
+discarded because it generates documents according to the so-called legacy docling schema.
 
 #### Usage
-The generated artifacts can later be used to generete and ingest the embeddings into a vector database.
+The generated artifacts can later be used to generate and ingest the embeddings into a vector database.
 
 ### 2.3 Document Processing Pipeline Options
+```bash
+% ilab data process --help
+Usage: ilab data process [OPTIONS] OUTPUT_DIR
 
+  The document processing pipeline
+
+Options:
+  --input DIRECTORY  The folder with user documents to process.
+  --help             Show this message and exit.```
+```
 
 | Option Description | Default Value | CLI Flag | Environment Variable |
 |--------------------|---------------|----------|----------------------|
+| Location folder of user documents. In case it's missing, the taxonomy is navigated to look for updated knowledge documents.|  | `--input` | `ILAB_PROCESS_INPUT` |
 | Base directories where models are stored. | `$HOME/.cache/instructlab/models`  | `--model-dir` | `ILAB_MODEL_DIR` |
 | Name of the embedding model. | **TBD** | `--embedding-model` | `ILAB_EMBEDDING_MODEL_NAME` |
 
 ### 2.4 Embedding Ingestion Pipeline
-The proposal is to add an `ingest` sub-command to the `data` command group:
+The proposal is to add an `ingest` sub-command to the `data` command group.
+
+For the Model Training path: 
 ```
-ilab data ingest /path/to/docs/folder
+ilab data ingest
+```
+
+For the Taxonomy or Plug-and-Play RAG paths:
+```
+ilab data ingest /path/to/processed/folder
 ```
 
 #### Working Assumption
@@ -119,8 +141,12 @@ The documents at the specified path have already been processed using the `data 
 (see [Getting Started with Knowledge Contributions][ilab-knowledge]).
 
 #### Command Purpose
-Generate the embeddings from the pre-processed documents at */path/to/docs/folder* folder and store them in the
-configured vector database.
+Generate the embeddings from the pre-processed documents.
+* In case of Model Training path, the documents are located in the location specified by the `generate.output_dir` configuration key
+  (e.g. `_HOME_/.local/share/instructlab/datasets`).
+  * In particular, only the latest folder with name starting by `documents-` will be explored.
+  * It must include a subfolder `docling-artifacts` with the actual json files.
+* In case the */path/to/processed/folder* parameter is provided, it is used to lookup the processed documents to ingest.
 
 **Notes**:
 * To ensure consistency and avoid issues with document versioning or outdated embeddings, the ingested collection will be cleared before execution. 
@@ -138,17 +164,35 @@ The generated embeddings can later be retrieved from a vector database and conve
 context for RAG-based chat pipelines.
 
 ### 2.5 Embedding Ingestion Pipeline Options
+```bash
+% ilab data ingest --help 
+Usage: ilab data ingest [OPTIONS] INPUT_DIR
+
+  The embedding ingestion pipeline
+
+Options:
+  --document-store-type TEXT      The document store type, one of:
+                                  `milvuslite`, `milvus`.
+  --document-store-uri TEXT       The document store URI
+  --document-store-collection-name TEXT
+                                  The document store collection name
+  --model-dir TEXT                Base directories where models are stored.
+                                  [default: (The default system model location
+                                  store, located in the data directory.)]
+  --embedding-model TEXT          The embedding model name
+  --help                          Show this message and exit.
+```
 
 | Option Description | Default Value | CLI Flag | Environment Variable |
 |--------------------|---------------|----------|----------------------|
-| Vector DB implementation, one of: `milvuslite`, **TBD** | `milvuslite` | `--vectordb-type` | `ILAB_VECTORDB_TYPE` |
-| Vector DB service URI. | `./rag-output.db` | `--vectordb-uri` | `ILAB_VECTORDB_URI` |
-| Vector DB collection name. | `IlabEmbeddings` | `--vectordb-collection-name` | `ILAB_VECTORDB_COLLECTION_NAME` |
-| Base directories where models are stored. | `$HOME/.cache/instructlab/models`  | `--model-dir` | `ILAB_MODEL_DIR` |
-| Name of the embedding model. | **TBD** | `--embedding-model` | `ILAB_EMBEDDING_MODEL_NAME` |
+| Document store implementation, one of: `milvuslite`, **TBD** | `milvuslite` | `--document-store-type` | `ILAB_DOCUMENT_STORE_TYPE` |
+| Document store service URI. | `./embeddings.db` | `--document-store-uri` | `ILAB_DOCUMENT_STORE_URI` |
+| Document store collection name. | `IlabEmbeddings` | `--document-store-collection-name` | `ILAB_DOCUMENT_STORE_COLLECTION_NAME` |
+| Base directories where models are stored. | `$HOME/.cache/instructlab/models`  | `--retriever-embedder-model-dir` | `ILAB_EMBEDDER_MODEL_DIR` |
+| Name of the embedding model. | **TBD** | `--retriever-embedder-model-name` | `ILAB_EMBEDDER_MODEL_NAME` |
 
 ### 2.6 RAG Chat Pipeline Command
-The proposal is to add a `--rag` flag to the `model chat` command, like:
+The proposal is to add a `chat.rag.enable` configuration (or the equivalent `--rag` flag) to the `model chat` command, like:
 ```
 ilab model chat --rag
 ```
@@ -212,21 +256,26 @@ but we'll use flags and environment variables for the options that come from the
 
 | Configuration FQN | Description | Default Value | CLI Flag | Environment Variable |
 |-------------------|-------------|---------------|----------|----------------------|
-| chat.rag.enabled | Enable or disable the RAG pipeline. | `false` | `--rag` (boolean)| `ILAB_CHAT_RAG_ENABLED` |
-| chat.rag.retriever.top_k | The maximum number of documents to retrieve. | `10` | `--retriever-top-k` | `ILAB_CHAT_RAG_RETRIEVER_TOP_K` |
-| | Vector DB implementation, one of: `milvuslite`, **TBD** | `milvuslite` | `--vectordb-type` | `ILAB_VECTORDB_TYPE` |
-| | Vector DB service URI. | `./rag-output.db` | `--vectordb-uri` | `ILAB_VECTORDB_URI` |
-| | Vector DB collection name. | `IlabEmbeddings` | `--vectordb-collection-name` | `ILAB_VECTORDB_COLLECTION_NAME` |
-| | Base directories where models are stored. | `$HOME/.cache/instructlab/models`  | `--model-dir` | `ILAB_MODEL_DIR` |
-| | Name of the embedding model. | **TBD** | `--model` | `ILAB_EMBEDDING_MODEL_NAME` |
+| chat.rag.enabled | Enable or disable the RAG pipeline. | `false` | `--rag` (boolean)| `ILAB_RAG` |
+| chat.rag.retriever.top_k | The maximum number of documents to retrieve. | `10` | `--retriever-top-k` | `ILAB_RETRIEVER_TOP_K` |
+| | Document store implementation, one of: `milvuslite`, **TBD** | `milvuslite` | `--document-store-type` | `ILAB_DOCUMENT_STORE_TYPE` |
+| | Document storeservice URI. | `./embeddings.db` | `--document-store-uri` | `ILAB_DOCUMENT_STORE_URI` |
+| | Document store collection name. | `IlabEmbeddings` | `--document-store-collection-name` | `ILAB_DOCUMENT_STORE_COLLECTION_NAME` |
+| | Base directories where models are stored. | `$HOME/.cache/instructlab/models`  | `--retriever-embedder-model-dir` | `ILAB_EMBEDDER_MODEL_DIR` |
+| | Name of the embedding model. | **TBD** | `--retriever-embedder-model-name` | `ILAB_EMBEDDER_MODEL_NAME` |
 
 Equivalent YAML document for the newly proposed options:
 ```yaml
 chat:
-  rag:
-    enabled: false
+    enable: false
     retriever:
-      top_k: 10
+      top_k: 20
+      embedder:
+        model_name: sentence-transformers/all-minilm-l6-v2
+    document_store:
+      type: milvuslite
+      uri: embeddings.db
+      collection_name: Ilab
 ```
 
 ### 2.9 References
@@ -236,7 +285,8 @@ chat:
 
 
 ### 2.10 Workflow Visualization
-<!-- https://excalidraw.com/#json=PN2h_LM-Wd2WZYBJfZMDs,WQCq5NDbRXUH2qr8maFFNg -->
+(Link to [shared Excalidraw][shared-excalidraw])
+
 Embedding ingestion pipeline:
 ![ingestion-mvp](../images/ingestion-mvp.png)
 RAG-based Chat pipeline:
@@ -300,8 +350,10 @@ ilab model chat --rag --retriever-type api --retriever-uri http://localhost:8123
 ```
 
 [ilab-knowledge]: https://github.com/instructlab/taxonomy?tab=readme-ov-file#getting-started-with-knowledge-contributions
+[sdg-diff-strategy]: https://github.com/instructlab/sdg/blob/main/src/instructlab/sdg/utils/taxonomy.py
 [chat_template]: https://github.com/instructlab/instructlab/blob/0a773f05f8f57285930df101575241c649f591ce/src/instructlab/configuration.py#L244
 [augment_chat_template]: https://github.com/instructlab/instructlab/blob/48e3f7f1574ae50036d6e342b8d78d8eb9546bd5/src/instructlab/model/backends/llama_cpp.py#L281
 [ranking]: https://docs.haystack.deepset.ai/v1.21/reference/ranker-api
 [expansion]: https://haystack.deepset.ai/blog/query-expansion
 [chunkers]: https://github.com/DS4SD/docling/blob/main/docs/concepts/chunking.md
+[shared-excalidraw]: https://excalidraw.com/#json=D_sPMvwB0XbCVoBL1hyAi,R_rUo6ljInJPrcWnbOO5pQ
