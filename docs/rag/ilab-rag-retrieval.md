@@ -9,6 +9,10 @@
 
 **Version**: 0.1
 
+**Options to Rebuild Excalidraw Diagrams**:
+* Using this [shareable link][shareable-excalidraw]
+* Importing the scene from the exported [DSL](./images/rag-ingestion-and-chat.excalidraw)
+
 ## 1. Introduction
 This document proposes enhancements to the `ilab` CLI to support workflows utilizing Retrieval-Augmented Generation
 (RAG) artifacts within `InstructLab`. The proposed changes introduce new commands and options for the embedding ingestion
@@ -23,19 +27,19 @@ The commands are tailored to support diverse user experiences, all enabling the 
 
 ### 1.2 Model Training Path
 This flow is designed for users who aim to train their own models and leverage the source documents that support knowledge submissions to enhance the chat context:
-![model-training](../images/rag-model-training.png)
+![model-training](./images/rag-model-training.png)
 
 **Note**: documents are processed using `instructlab-sdg` package and are defined using the docling v1 schema.
 
 ### 1.3 Tanomony Path (no Training)
 This flow is for users who have defined taxonomy knowledge but prefer not to train their own models. Instead, they aim to generate RAG artifacts from source documents to enhance the chat context:
-![tanomony-no-training](../images/rag-tanomony-no-training.png)
+![tanomony-no-training](./images/rag-tanomony-no-training.png)
 
 **Note**: documents are processed using `docling.DocumentConverter` and are defined using the docling v2 schema.
 
 ### 1.4 Plug-and-Play RAG Path
 This flow is designed for users who want to enhance their chat experience with pre-trained models by simply integrating the RAG functionality:
-![plug-and-play](../images/rag-plug-and-play.png)
+![plug-and-play](./images/rag-plug-and-play.png)
 
 **Note**: documents are processed using `docling.DocumentConverter` and are defined using the docling v2 schema.
 
@@ -285,12 +289,11 @@ chat:
 
 
 ### 2.10 Workflow Visualization
-(Link to [shared Excalidraw][shared-excalidraw])
 
 Embedding ingestion pipeline:
-![ingestion-mvp](../images/ingestion-mvp.png)
+![ingestion-mvp](./images/ingestion-mvp.png)
 RAG-based Chat pipeline:
-![rag-chat](../images/rag-chat.png)
+![rag-chat](./images/rag-chat.png)
 
 ### 2.11 Proposed Implementation Stack
 > **ℹ️ Note:** This stack is still under review. The proposed list represents potential candidates based on the current state of discussions.
@@ -349,6 +352,7 @@ ilab serve --rag-embeddings --image-name=docker.io/user/my_rag_artifacts:1.0 --p
 ilab model chat --rag --retriever-type api --retriever-uri http://localhost:8123
 ```
 
+[shareable-excalidraw]: https://excalidraw.com/#json=p126_RwjtILDahmnIFK9c,11xoIhRQCkUVRm0Wkg-Ysg
 [ilab-knowledge]: https://github.com/instructlab/taxonomy?tab=readme-ov-file#getting-started-with-knowledge-contributions
 [sdg-diff-strategy]: https://github.com/instructlab/sdg/blob/main/src/instructlab/sdg/utils/taxonomy.py
 [chat_template]: https://github.com/instructlab/instructlab/blob/0a773f05f8f57285930df101575241c649f591ce/src/instructlab/configuration.py#L244
@@ -356,4 +360,3 @@ ilab model chat --rag --retriever-type api --retriever-uri http://localhost:8123
 [ranking]: https://docs.haystack.deepset.ai/v1.21/reference/ranker-api
 [expansion]: https://haystack.deepset.ai/blog/query-expansion
 [chunkers]: https://github.com/DS4SD/docling/blob/main/docs/concepts/chunking.md
-[shared-excalidraw]: https://excalidraw.com/#json=D_sPMvwB0XbCVoBL1hyAi,R_rUo6ljInJPrcWnbOO5pQ
