@@ -81,12 +81,12 @@ The proposal is to add a `process`  sub-command to the `data` command group.
 
 For the Taxonomy path (no Model Training): 
 ```
-ilab data process /path/to/processed/folder
+ilab data process --output /path/to/processed/folder
 ```
 
 For the Plag-and-Play RAG path: 
 ```
-ilab data process --input /path/to/docs/folder /path/to/processed/folder
+ilab data process --input /path/to/docs/folder --output /path/to/processed/folder
 ```
  
 #### Command Purpose
@@ -112,18 +112,24 @@ The generated artifacts can later be used to generate and ingest the embeddings 
 ### 2.3 Document Processing Pipeline Options
 ```bash
 % ilab data process --help
-Usage: ilab data process [OPTIONS] OUTPUT_DIR
+Usage: ilab data process [OPTIONS]
 
   The document processing pipeline
 
 Options:
-  --input DIRECTORY  The folder with user documents to process.
-  --help             Show this message and exit.```
+  --input DIRECTORY     The folder with user documents to process. In case
+                        it's missing, the knowledge taxonomy files will be
+                        processed instead.
+  --taxonomy-path PATH  Directory where taxonomy is stored and accessed from.
+  --taxonomy-base TEXT  Branch of taxonomy used to calculate diff against.
+  --output DIRECTORY    Directory where processed docs are stored.
+  --help                Show this message and exit.
 ```
 
 | Option Description | Default Value | CLI Flag | Environment Variable |
 |--------------------|---------------|----------|----------------------|
 | Location folder of user documents. In case it's missing, the taxonomy is navigated to look for updated knowledge documents.|  | `--input` | `ILAB_PROCESS_INPUT` |
+| Location folder of processed documents. |  | `--ouput` | `ILAB_PROCESS_OUTPUT` |
 | Base directories where models are stored. | `$HOME/.cache/instructlab/models`  | `--model-dir` | `ILAB_MODEL_DIR` |
 | Name of the embedding model. | **TBD** | `--embedding-model` | `ILAB_EMBEDDING_MODEL_NAME` |
 
@@ -137,7 +143,7 @@ ilab data ingest
 
 For the Taxonomy or Plug-and-Play RAG paths:
 ```
-ilab data ingest /path/to/processed/folder
+ilab data ingest --input path/to/processed/folder
 ```
 
 #### Working Assumption
@@ -170,13 +176,13 @@ context for RAG-based chat pipelines.
 ### 2.5 Embedding Ingestion Pipeline Options
 ```bash
 % ilab data ingest --help 
-Usage: ilab data ingest [OPTIONS] INPUT_DIR
+Usage: ilab data ingest [OPTIONS]
 
   The embedding ingestion pipeline
 
 Options:
   --document-store-type TEXT      The document store type, one of:
-                                  `milvuslite`, `milvus`.
+                                  `milvuslite`.
   --document-store-uri TEXT       The document store URI
   --document-store-collection-name TEXT
                                   The document store collection name
@@ -184,6 +190,10 @@ Options:
                                   [default: (The default system model location
                                   store, located in the data directory.)]
   --embedding-model TEXT          The embedding model name
+  --output-dir TEXT               Directory where generated datasets are
+                                  stored.
+  --input DIRECTORY               Directory where pre-processed documents are
+                                  located.
   --help                          Show this message and exit.
 ```
 
@@ -352,7 +362,7 @@ ilab serve --rag-embeddings --image-name=docker.io/user/my_rag_artifacts:1.0 --p
 ilab model chat --rag --retriever-type api --retriever-uri http://localhost:8123
 ```
 
-[shareable-excalidraw]: https://excalidraw.com/#json=p126_RwjtILDahmnIFK9c,11xoIhRQCkUVRm0Wkg-Ysg
+[shareable-excalidraw]: https://excalidraw.com/#json=ZiTMvxn67gep679hqJrpO,VBDADxrmGht7zJSWKQCjug
 [ilab-knowledge]: https://github.com/instructlab/taxonomy?tab=readme-ov-file#getting-started-with-knowledge-contributions
 [sdg-diff-strategy]: https://github.com/instructlab/sdg/blob/main/src/instructlab/sdg/utils/taxonomy.py
 [chat_template]: https://github.com/instructlab/instructlab/blob/0a773f05f8f57285930df101575241c649f591ce/src/instructlab/configuration.py#L244
