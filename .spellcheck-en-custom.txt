@@ -157,6 +157,8 @@ onboarding
 OpenAI
 openai
 OpenStax
+openai
+OpenAI
 optimizers
 orchestrator
 ots
@@ -228,6 +230,7 @@ src
 Srivastava
 Staar
 Standup
+Staar
 subcommand
 subcommands
 subdirectory
@@ -262,6 +265,7 @@ UX
 vectordbs
 Veeradhi
 venv
+Veeradhi
 Vishnoi
 vLLM
 vllm
