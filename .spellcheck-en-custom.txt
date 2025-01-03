@@ -2,7 +2,6 @@
 # Please keep this file sorted:
 Abhishek
 ADR
-agentic
 Akash
 AMDGPU
 Anil
@@ -157,8 +156,6 @@ onboarding
 OpenAI
 openai
 OpenStax
-openai
-OpenAI
 optimizers
 orchestrator
 ots
@@ -230,7 +227,6 @@ src
 Srivastava
 Staar
 Standup
-Staar
 subcommand
 subcommands
 subdirectory
