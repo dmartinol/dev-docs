@@ -309,7 +309,7 @@ The current status could be displayed with an additional marker on the chat stat
 
 ### 2.8 RAG Chat Options
 
-As we stated in [2.1 Working Assumptions](#21-working-assumption), we will introduce new configuration options for the spceific `chat` command,
+As we stated in [2.1 Working Assumptions](#21-working-assumption), we will introduce new configuration options for the specific `chat` command,
 but we'll use flags and environment variables for the options that come from the embedding ingestion pipeline command.
 
 | Configuration FQN | Description | Default Value | CLI Flag | Environment Variable |
