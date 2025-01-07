@@ -31,9 +31,9 @@ This flow is designed for users who aim to train their own models and leverage t
 
 **Note**: documents are processed using `instructlab-sdg` package and are defined using the docling v1 schema.
 
-### 1.3 Tanomony Path (no Training)
+### 1.3 Taxonomy Path (no Training)
 This flow is for users who have defined taxonomy knowledge but prefer not to train their own models. Instead, they aim to generate RAG artifacts from source documents to enhance the chat context:
-![tanomony-no-training](./images/rag-tanomony-no-training.png)
+![taxonomy-no-training](./images/rag-taxonomy-no-training.png)
 
 **Note**: documents are processed using `docling.DocumentConverter` and are defined using the docling v2 schema.
 
@@ -84,7 +84,7 @@ For the Taxonomy path (no Model Training):
 ilab data process --output /path/to/processed/folder
 ```
 
-For the Plag-and-Play RAG path: 
+For the Plug-and-Play RAG path: 
 ```
 ilab data process --input /path/to/docs/folder --output /path/to/processed/folder
 ```
@@ -273,7 +273,7 @@ but we'll use flags and environment variables for the options that come from the
 | chat.rag.enabled | Enable or disable the RAG pipeline. | `false` | `--rag` (boolean)| `ILAB_RAG` |
 | chat.rag.retriever.top_k | The maximum number of documents to retrieve. | `10` | `--retriever-top-k` | `ILAB_RETRIEVER_TOP_K` |
 | | Document store implementation, one of: `milvuslite`, **TBD** | `milvuslite` | `--document-store-type` | `ILAB_DOCUMENT_STORE_TYPE` |
-| | Document storeservice URI. | `./embeddings.db` | `--document-store-uri` | `ILAB_DOCUMENT_STORE_URI` |
+| | Document store service URI. | `./embeddings.db` | `--document-store-uri` | `ILAB_DOCUMENT_STORE_URI` |
 | | Document store collection name. | `IlabEmbeddings` | `--document-store-collection-name` | `ILAB_DOCUMENT_STORE_COLLECTION_NAME` |
 | | Base directories where models are stored. | `$HOME/.cache/instructlab/models`  | `--retriever-embedder-model-dir` | `ILAB_EMBEDDER_MODEL_DIR` |
 | | Name of the embedding model. | **TBD** | `--retriever-embedder-model-name` | `ILAB_EMBEDDER_MODEL_NAME` |
