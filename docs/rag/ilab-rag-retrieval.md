@@ -1,6 +1,6 @@
 # Design Proposal - Embedding Ingestion Pipeline And RAG-Based Chat
 
-**TODOs**
+Not addressed in this document:
 
 * Vector store authentication options.
 * Document versioning and data update policies.
@@ -22,9 +22,10 @@ This document proposes enhancements to the `ilab` CLI to support workflows utili
 (RAG) artifacts within `InstructLab`. The proposed changes introduce new commands and options for the embedding ingestion
 and RAG-based chat pipelines:
 
-* A new `ilab data` sub-command to process customer documentation.
+* A new `ilab rag` command group, feature gated behind a `ILAB_DEV_PREVIEW` environment variable.
+* A new `ilab rag` sub-command  group to process customer documentation.
   * Either from knowledge taxonomy or from actual user documents.
-* A new `ilab data` sub-command to generate and ingest embeddings from pre-processed documents into a configured vector store.
+* A new `ilab rag` sub-command to generate and ingest embeddings from pre-processed documents into a configured vector store.
 * An option to enhance the chat pipeline by using the stored embeddings to augment the context of conversations, improving relevance and accuracy.
 
 ### 1.1 User Experience Overview
@@ -94,18 +95,18 @@ consistently to all new and updated commands.
 
 ### 2.2 Document Processing Pipeline
 
-The proposal is to add a `process`  sub-command to the `data` command group.
+The proposal is to add a `process` sub-command to the `rag` command group.
 
 For the Taxonomy path (no Model Training):
 
 ```bash
-ilab data process --output /path/to/processed/folder
+ilab rag convert --output /path/to/processed/folder
 ```
 
 For the Plug-and-Play RAG path:
 
 ```bash
-ilab data process --input /path/to/docs/folder --output /path/to/processed/folder
+ilab rag convert --input /path/to/docs/folder --output /path/to/processed/folder
 ```
 
 #### Processing-Command Purpose
@@ -134,11 +135,13 @@ The generated artifacts can later be used to generate and ingest the embeddings 
 
 ### 2.3 Document Processing Pipeline Options
 
-```bash
-% ilab data process --help
-Usage: ilab data process [OPTIONS]
+**Note**: The `--help` option will be aware of the `rag` command group only if `ILAB_DEV_PREVIEW` environment variable is set to `true`.
 
-  The document processing pipeline
+```bash
+% ilab rag convert --help
+Usage: ilab rag convert [OPTIONS]
+
+  The document processing pipeline for retrieval augmented generation
 
 Options:
   --input DIRECTORY     The folder with user documents to process. In case
@@ -159,23 +162,23 @@ Options:
 
 ### 2.4 Embedding Ingestion Pipeline
 
-The proposal is to add an `ingest` sub-command to the `data` command group.
+The proposal is to add an `ingest` sub-command to the `rag` command group.
 
 For the Model Training path:
 
 ```bash
-ilab data ingest
+ilab rag ingest
 ```
 
 For the Taxonomy or Plug-and-Play RAG paths:
 
 ```bash
-ilab data ingest --input path/to/processed/folder
+ilab rag ingest --input path/to/processed/folder
 ```
 
 #### Ingestion-Working Assumption
 
-The documents at the specified path have already been processed using the `data process` command or an equivalent method
+The documents at the specified path have already been processed using the `rag convert` command or an equivalent method
 (see [Getting Started with Knowledge Contributions][ilab-knowledge]).
 
 #### Ingestion-Command Purpose
@@ -209,9 +212,11 @@ context for RAG-based chat pipelines.
 
 ### 2.5 Embedding Ingestion Pipeline Options
 
+**Note**: The `--help` option will be aware of the `rag` command group only if `ILAB_DEV_PREVIEW` environment variable is set to `true`.
+
 ```bash
-% ilab data ingest --help 
-Usage: ilab data ingest [OPTIONS]
+% ilab rag ingest --help 
+Usage: ilab rag ingest [OPTIONS]
 
   The embedding ingestion pipeline
 
@@ -411,7 +416,7 @@ ilab model chat --rag --retrieval-strategy query-expansion --retrieval-strategy-
 Generate a containerized RAG artifact to expose a `/query` endpoint that can serve as an alternative source :
 
 ```bash
-ilab data ingest --build-image --image-name=docker.io/user/my_rag_artifacts:1.0
+ilab rag ingest --build-image --image-name=docker.io/user/my_rag_artifacts:1.0
 ```
 
 Then serve it and use it in a chat session:
