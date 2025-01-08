@@ -16,6 +16,7 @@ Not addressed in this document:
 * Using this [shareable link][shareable-excalidraw]
 * Importing the scene from the exported [DSL](./images/rag-ingestion-and-chat.excalidraw)
 * Importing the provided images in Excalidraw
+* Importing the provided images in Excalidraw
 
 ## 1. Introduction
 
