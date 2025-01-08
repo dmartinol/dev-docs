@@ -15,6 +15,7 @@ Not addressed in this document:
 
 * Using this [shareable link][shareable-excalidraw]
 * Importing the scene from the exported [DSL](./images/rag-ingestion-and-chat.excalidraw)
+* Importing the provided images in Excalidraw
 
 ## 1. Introduction
 
@@ -426,7 +427,7 @@ ilab serve --rag-embeddings --image-name=docker.io/user/my_rag_artifacts:1.0 --p
 ilab model chat --rag --retriever-type api --retriever-uri http://localhost:8123
 ```
 
-[shareable-excalidraw]: https://excalidraw.com/#json=ZiTMvxn67gep679hqJrpO,VBDADxrmGht7zJSWKQCjug
+[shareable-excalidraw]: https://excalidraw.com/#json=UNReLpF8DSFoe-zg4w7I8,rZjZB4ZQnpmkM084B4qjkw
 [ilab-knowledge]: https://github.com/instructlab/taxonomy?tab=readme-ov-file#getting-started-with-knowledge-contributions
 [sdg-diff-strategy]: https://github.com/instructlab/sdg/blob/main/src/instructlab/sdg/utils/taxonomy.py
 [chat_template]: https://github.com/instructlab/instructlab/blob/0a773f05f8f57285930df101575241c649f591ce/src/instructlab/configuration.py#L244
