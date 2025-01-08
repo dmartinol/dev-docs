@@ -262,7 +262,6 @@ UX
 vectordbs
 Veeradhi
 venv
-Veeradhi
 Vishnoi
 vLLM
 vllm
