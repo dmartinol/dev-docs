@@ -97,7 +97,7 @@ consistently to all new and updated commands.
 
 ### 2.2 Document Processing Pipeline
 
-The proposal is to add a `process` sub-command to the `rag` command group.
+The proposal is to add a `convert` sub-command to the `rag` command group.
 
 For the Taxonomy path (no Model Training):
 
@@ -157,8 +157,8 @@ Options:
 
 | Option Description | Default Value | CLI Flag | Environment Variable |
 |--------------------|---------------|----------|----------------------|
-| Location folder of user documents. In case it's missing, the taxonomy is navigated to look for updated knowledge documents.|  | `--input` | `ILAB_PROCESS_INPUT` |
-| Location folder of processed documents. |  | `--ouput` | `ILAB_PROCESS_OUTPUT` |
+| Location folder of user documents. In case it's missing, the taxonomy is navigated to look for updated knowledge documents.|  | `--input` | `ILAB_CONVERT_INPUT` |
+| Location folder of processed documents. |  | `--ouput` | `ILAB_CONVERT_OUTPUT` |
 | Base directories where models are stored. | `$HOME/.cache/instructlab/models`  | `--model-dir` | `ILAB_MODEL_DIR` |
 | Name of the embedding model. | **TBD** | `--embedding-model` | `ILAB_EMBEDDING_MODEL_NAME` |
 
