@@ -85,10 +85,10 @@ For example, the `vectordb-uri` argument can be implemented using the `click` mo
 
 The embedding model used to generate text embeddings must be downloaded locally before executing the pipeline.
 
-For example, this command can be used to download the `sentence-transformers/all-minilm-l6-v2` model to the local models cache:
+For example, this command can be used to download the `ibm-granite/granite-embedding-125m-english` model to the local models cache:
 
 ```bash
-ilab model download -rp sentence-transformers/all-minilm-l6-v2
+ilab model download -rp ibm-granite/granite-embedding-125m-english
 ```
 
 If the configured embedding model has not been cached, the command execution will terminate with an error. This requirement applies
@@ -336,7 +336,7 @@ chat:
     retriever:
       top_k: 20
       embedder:
-        model_name: sentence-transformers/all-minilm-l6-v2
+        model_name: ibm-granite/granite-embedding-125m-english
     document_store:
       type: milvuslite
       uri: embeddings.db
@@ -427,7 +427,7 @@ ilab serve --rag-embeddings --image-name=docker.io/user/my_rag_artifacts:1.0 --p
 ilab model chat --rag --retriever-type api --retriever-uri http://localhost:8123
 ```
 
-[shareable-excalidraw]: https://excalidraw.com/#json=UNReLpF8DSFoe-zg4w7I8,rZjZB4ZQnpmkM084B4qjkw
+[shareable-excalidraw]: https://excalidraw.com/#json=P2mG25EAjeBRvqzpfIGXv,tlKJPzA2HakGygxJbmn-VQ
 [ilab-knowledge]: https://github.com/instructlab/taxonomy?tab=readme-ov-file#getting-started-with-knowledge-contributions
 [sdg-diff-strategy]: https://github.com/instructlab/sdg/blob/main/src/instructlab/sdg/utils/taxonomy.py
 [chat_template]: https://github.com/instructlab/instructlab/blob/0a773f05f8f57285930df101575241c649f591ce/src/instructlab/configuration.py#L244
