@@ -256,6 +256,8 @@ The proposal is to add a `chat.rag.enable` configuration (or the equivalent `--r
 ilab model chat --rag
 ```
 
+As with the commands in the `ilab rag` group, a precondition is that `ILAB_ENABLE_EXPERIMENTAL` environment variable must be set to `1`.
+
 #### Command Purpose
 
 This command enhances the existing `ilab model chat` functionality by integrating contextual information retrieved from user-provided documents,
@@ -286,7 +288,7 @@ Future extensions should align prompt management with the existing InstructLab d
 ### 2.7 RAG Chat Commands
 
 The `/r` command may be added to the `ilab model chat` command to dynamically toggle the execution of the RAG pipeline.
-This will only appear in the help list if `ILAB_ENABLE_EXPERIMENTAL` is set to `1`.
+This will only appear in the help list if `ILAB_ENABLE_EXPERIMENTAL` environment variable is set to `1`.
 
 The current status could be displayed with an additional marker on the chat status bar, as in (top right corner):
 
