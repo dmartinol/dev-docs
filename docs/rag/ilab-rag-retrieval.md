@@ -24,8 +24,9 @@ This document proposes enhancements to the `ilab` CLI to support workflows utili
 (RAG) artifacts within `InstructLab`. The proposed changes introduce new commands and options for the embedding ingestion
 and RAG-based chat pipelines:
 
-* A new `ilab rag` command group, feature gated behind a `ILAB_DEV_PREVIEW` environment variable.
-* A new `ilab rag` sub-command  group to process customer documentation.
+* A new `ilab rag` command group, feature gated behind a `ILAB_ENABLE_EXPERIMENTAL` environment variable.
+  * The application will exit with an error message if used without feature flag being set to `1`.
+* A new `ilab rag` sub-command  group to process user documentation.
   * Either from knowledge taxonomy or from actual user documents.
 * A new `ilab rag` sub-command to generate and ingest embeddings from pre-processed documents into a configured vector store.
 * An option to enhance the chat pipeline by using the stored embeddings to augment the context of conversations, improving relevance and accuracy.
@@ -34,24 +35,24 @@ and RAG-based chat pipelines:
 
 The commands are tailored to support diverse user experiences, all enabling the use of RAG functionality to enrich chat sessions.
 
-### 1.2 Model Training Path
+### 1.2 Plug-and-Play RAG Path
+
+This flow is designed for users who want to enhance their chat experience with pre-trained models by simply integrating the RAG functionality:
+![plug-and-play](./images/rag-plug-and-play.png)
+
+**Note**: documents are processed using `docling.DocumentConverter` and are defined using the docling v2 schema.
+
+### 1.3 Model Training Path
 
 This flow is designed for users who aim to train their own models and leverage the source documents that support knowledge submissions to enhance the chat context:
 ![model-training](./images/rag-model-training.png)
 
 **Note**: documents are processed using `instructlab-sdg` package and are defined using the docling v1 schema.
 
-### 1.3 Taxonomy Path (no Training)
+### 1.4 Taxonomy Path (no Training)
 
 This flow is for users who have defined taxonomy knowledge but prefer not to train their own models. Instead, they aim to generate RAG artifacts from source documents to enhance the chat context:
 ![taxonomy-no-training](./images/rag-taxonomy-no-training.png)
-
-**Note**: documents are processed using `docling.DocumentConverter` and are defined using the docling v2 schema.
-
-### 1.4 Plug-and-Play RAG Path
-
-This flow is designed for users who want to enhance their chat experience with pre-trained models by simply integrating the RAG functionality:
-![plug-and-play](./images/rag-plug-and-play.png)
 
 **Note**: documents are processed using `docling.DocumentConverter` and are defined using the docling v2 schema.
 
@@ -137,7 +138,7 @@ The generated artifacts can later be used to generate and ingest the embeddings 
 
 ### 2.3 Document Processing Pipeline Options
 
-**Note**: The `--help` option will be aware of the `rag` command group only if `ILAB_DEV_PREVIEW` environment variable is set to `true`.
+**Note**: The `--help` option will be aware of the `rag` command group only if `ILAB_ENABLE_EXPERIMENTAL` environment variable is set to `1`.
 
 ```bash
 % ilab rag convert --help
@@ -214,7 +215,7 @@ context for RAG-based chat pipelines.
 
 ### 2.5 Embedding Ingestion Pipeline Options
 
-**Note**: The `--help` option will be aware of the `rag` command group only if `ILAB_DEV_PREVIEW` environment variable is set to `true`.
+**Note**: The `--help` option will be aware of the `rag` command group only if `ILAB_ENABLE_EXPERIMENTAL` environment variable is set to `1`.
 
 ```bash
 % ilab rag ingest --help 
@@ -285,6 +286,7 @@ Future extensions should align prompt management with the existing InstructLab d
 ### 2.7 RAG Chat Commands
 
 The `/r` command may be added to the `ilab model chat` command to dynamically toggle the execution of the RAG pipeline.
+This will only appear in the help list if `ILAB_ENABLE_EXPERIMENTAL` is set to `1`.
 
 The current status could be displayed with an additional marker on the chat status bar, as in (top right corner):
 
