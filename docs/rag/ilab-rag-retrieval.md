@@ -66,22 +66,13 @@ cases.
 
 #### Command Options
 
-To maintain compatibility and simplicity, no new configurations will be introduced for new commands. Instead,
-the settings will be defined using the following hierarchy (options higher in the list overriding those below):
+New configurations options are introduced to manage the execution of the new commands. Comments will be added to clarify that these configuration fields may change in the future,
+as this is an experimental feature.
+The command execution can be customized using the following hierarchy, where options higher in the list override those below:
 
 * CLI flags (e.g., `--FLAG`).
-* Environment variables following a consistent naming convention, such as `ILAB_<UPPERCASE_FLAG_NAME>`.
+* Configuration fields defined with `ilab config` commands.
 * Default values, for all the applicable use cases.
-
-For example, the `vectordb-uri` argument can be implemented using the `click` module like this:
-
-```py
-@click.option(
-    "--document-store-uri",
-    default='rag-output.db',
-    envvar="ILAB_DOCUMENT_STORE_URI",
-)
-```
 
 #### Local embedding models
 
@@ -156,12 +147,22 @@ Options:
   --help                Show this message and exit.
 ```
 
-| Option Description | Default Value | CLI Flag | Environment Variable |
+| Option Description | Default Value | CLI Flag | Configuration Option |
 |--------------------|---------------|----------|----------------------|
-| Location folder of user documents. In case it's missing, the taxonomy is navigated to look for updated knowledge documents.|  | `--input` | `ILAB_CONVERT_INPUT` |
-| Location folder of processed documents. |  | `--ouput` | `ILAB_CONVERT_OUTPUT` |
-| Base directories where models are stored. | `$HOME/.cache/instructlab/models`  | `--model-dir` | `ILAB_MODEL_DIR` |
-| Name of the embedding model. | **TBD** | `--embedding-model` | `ILAB_EMBEDDING_MODEL_NAME` |
+| Location folder of user documents. In case it's missing, the taxonomy is navigated to look for updated knowledge documents.|  | `--input` | |
+| Location folder of processed documents. |  | `--ouput` | |
+| Directory where taxonomy is stored and accessed from. | `$HOME/.cache/instructlab/taxonomy` | `--taxonomy-path` | `rag.convert.taxonomy_path` |
+| Branch of taxonomy used to calculate diff against. | `origin/main` | `--taxonomy-base` | `rag.convert.taxonomy_base` |
+
+
+Equivalent YAML configuration:
+
+```yaml
+rag:
+  convert:
+    taxonomy_path: '...'
+    taxonomy_base: 'origin/main'
+```
 
 ### 2.4 Embedding Ingestion Pipeline
 
@@ -240,13 +241,27 @@ Options:
   --help                          Show this message and exit.
 ```
 
-| Option Description | Default Value | CLI Flag | Environment Variable |
+| Option Description | Default Value | CLI Flag | Configuration Option |
 |--------------------|---------------|----------|----------------------|
-| Document store implementation, one of: `milvuslite`, **TBD** | `milvuslite` | `--document-store-type` | `ILAB_DOCUMENT_STORE_TYPE` |
-| Document store service URI. | `./embeddings.db` | `--document-store-uri` | `ILAB_DOCUMENT_STORE_URI` |
-| Document store collection name. | `IlabEmbeddings` | `--document-store-collection-name` | `ILAB_DOCUMENT_STORE_COLLECTION_NAME` |
-| Base directories where models are stored. | `$HOME/.cache/instructlab/models`  | `--retriever-embedder-model-dir` | `ILAB_EMBEDDER_MODEL_DIR` |
-| Name of the embedding model. | **TBD** | `--retriever-embedder-model-name` | `ILAB_EMBEDDER_MODEL_NAME` |
+| Document store implementation, one of: `milvuslite`, **TBD** | `milvuslite` | `--document-store-type` | `rag.ingest.document_store.type` |
+| Document store service URI. | `./embeddings.db` | `--document-store-uri` | `rag.ingest.document_store.uri` |
+| Document store collection name. | `IlabEmbeddings` | `--document-store-collection-name` | `rag.ingest.document_store.collection_name` |
+| Base directories where models are stored. | `$HOME/.cache/instructlab/models`  | `--retriever-embedder-model-dir` | `rag.ingest.embedder.model_dir` |
+| Name of the embedding model. | **TBD**`  | `--embedding-model` | `rag.ingest.embedder.model_name` |
+
+Equivalent YAML configuration:
+
+```yaml
+rag:
+  ingest:
+    document_store:
+      type: milvuslite
+      uri: 'embeddings.db'
+      collection_name: IlabEmbeddings
+    embedder:
+      model_dir: '...'
+      model_name: ibm-granite/granite-embedding-125m-english
+```
 
 ### 2.6 RAG Chat Pipeline Command
 
@@ -320,18 +335,17 @@ The current status could be displayed with an additional marker on the chat stat
 
 ### 2.8 RAG Chat Options
 
-As we stated in [2.1 Working Assumptions](#21-working-assumption), we will introduce new configuration options for the specific `chat` command,
-but we'll use flags and environment variables for the options that come from the embedding ingestion pipeline command.
+As we stated in [2.1 Working Assumptions](#21-working-assumption), we will introduce new configuration options for the specific `chat` command.
 
-| Configuration FQN | Description | Default Value | CLI Flag | Environment Variable |
-|-------------------|-------------|---------------|----------|----------------------|
-| chat.rag.enabled | Enable or disable the RAG pipeline. | `false` | `--rag` (boolean)| `ILAB_RAG` |
-| chat.rag.retriever.top_k | The maximum number of documents to retrieve. | `10` | `--retriever-top-k` | `ILAB_RETRIEVER_TOP_K` |
-| | Document store implementation, one of: `milvuslite`, **TBD** | `milvuslite` | `--document-store-type` | `ILAB_DOCUMENT_STORE_TYPE` |
-| | Document store service URI. | `./embeddings.db` | `--document-store-uri` | `ILAB_DOCUMENT_STORE_URI` |
-| | Document store collection name. | `IlabEmbeddings` | `--document-store-collection-name` | `ILAB_DOCUMENT_STORE_COLLECTION_NAME` |
-| | Base directories where models are stored. | `$HOME/.cache/instructlab/models`  | `--retriever-embedder-model-dir` | `ILAB_EMBEDDER_MODEL_DIR` |
-| | Name of the embedding model. | **TBD** | `--retriever-embedder-model-name` | `ILAB_EMBEDDER_MODEL_NAME` |
+| Description | Default Value | CLI Flag | Configuration Option |
+|-------------|---------------|----------|----------------------|
+| Enable or disable the RAG pipeline. | `false` | `--rag` (boolean)| `chat.rag.enabled` |
+| The maximum number of documents to retrieve. | `10` | `--retriever-top-k` | `chat.rag.retriever.top_k` |
+| Document store implementation, one of: `milvuslite`, **TBD** | `milvuslite` | `--document-store-type` | `chat.rag.document_store.type` |
+| Document store service URI. | `./embeddings.db` | `--document-store-uri` | `chat.rag.document_store.uri` |
+| Document store collection name. | `IlabEmbeddings` | `--document-store-collection-name` | `chat.rag.document_store.collection_name` |
+| Base directories where models are stored. | `$HOME/.cache/instructlab/models`  | `--retriever-embedder-model-dir` | `chat.rag.retriever.embedder.model_dir` |
+| Name of the embedding model. | **TBD** | `--retriever-embedder-model-name` | `chat.rag.retriever.embedder.model_name` |
 
 Equivalent YAML document for the newly proposed options:
 
@@ -345,7 +359,7 @@ chat:
     document_store:
       type: milvuslite
       uri: embeddings.db
-      collection_name: Ilab
+      collection_name: IlabEmbeddings
 ```
 
 ### 2.9 References
