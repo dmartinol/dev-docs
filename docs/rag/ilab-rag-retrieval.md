@@ -94,13 +94,13 @@ The proposal is to add a `convert` sub-command to the `rag` command group.
 For the Taxonomy path (no Model Training):
 
 ```bash
-ilab rag convert --output /path/to/processed/folder
+ilab rag convert --output-dir /path/to/processed/folder
 ```
 
 For the Plug-and-Play RAG path:
 
 ```bash
-ilab rag convert --input /path/to/docs/folder --output /path/to/processed/folder
+ilab rag convert --input-dir /path/to/docs/folder --output-dir /path/to/processed/folder
 ```
 
 #### Processing-Command Purpose
@@ -114,7 +114,7 @@ Applies the docling transformation to the customer documents.
 
 ***Notes**:
 
-* In alignment with the current SDG implementation, the `--input` folder will not be navigated recursively. Only files located at the root
+* In alignment with the current SDG implementation, the `--input-dir` folder will not be navigated recursively. Only files located at the root
   level of the specified folder will be considered. The same principle applies to all other options outlined below.
 * To ensure consistency and avoid issues with document versioning or outdated artifacts, the destination folder will be cleared
   before execution. This ensures it contains only the artifacts generated from the most recent run.
@@ -138,18 +138,18 @@ Usage: ilab rag convert [OPTIONS]
   The document processing pipeline for retrieval augmented generation
 
 Options:
-  --input DIRECTORY     The folder with user documents to process. In case
-                        it's missing, the knowledge taxonomy files will be
-                        processed instead.
-  --taxonomy-path PATH  Directory where taxonomy is stored and accessed from.
-  --taxonomy-base TEXT  Branch of taxonomy used to calculate diff against.
-  --output DIRECTORY    Directory where processed docs are stored.
-  --help                Show this message and exit.
+  --input-dir DIRECTORY  The folder with user documents to process. In case
+                         it's missing, the knowledge taxonomy files will be
+                         processed instead.
+  --taxonomy-path PATH   Directory where taxonomy is stored and accessed from.
+  --taxonomy-base TEXT   Branch of taxonomy used to calculate diff against.
+  --output-dir DIRECTORY Directory where processed docs are stored.
+  --help                 Show this message and exit.
 ```
 
 | Option Description | Default Value | CLI Flag | Configuration Option |
 |--------------------|---------------|----------|----------------------|
-| Location folder of user documents. In case it's missing, the taxonomy is navigated to look for updated knowledge documents.|  | `--input` | |
+| Location folder of user documents. In case it's missing, the taxonomy is navigated to look for updated knowledge documents.|  | `--input-dir` | |
 | Location folder of processed documents. |  | `--ouput` | |
 | Directory where taxonomy is stored and accessed from. | `$HOME/.cache/instructlab/taxonomy` | `--taxonomy-path` | `rag.convert.taxonomy_path` |
 | Branch of taxonomy used to calculate diff against. | `origin/main` | `--taxonomy-base` | `rag.convert.taxonomy_base` |
@@ -177,7 +177,7 @@ ilab rag ingest
 For the Taxonomy or Plug-and-Play RAG paths:
 
 ```bash
-ilab rag ingest --input path/to/processed/folder
+ilab rag ingest --input-dir path/to/processed/folder
 ```
 
 #### Ingestion-Working Assumption
@@ -236,7 +236,7 @@ Options:
   --embedding-model TEXT          The embedding model name
   --output-dir TEXT               Directory where generated datasets are
                                   stored.
-  --input DIRECTORY               Directory where pre-processed documents are
+  --input-dir DIRECTORY           Directory where pre-processed documents are
                                   located.
   --help                          Show this message and exit.
 ```
